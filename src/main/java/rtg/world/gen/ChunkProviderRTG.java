@@ -20,10 +20,7 @@ import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.chunk.IChunkGenerator;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
-import net.minecraft.world.gen.ChunkProviderServer;
-import net.minecraft.world.gen.MapGenBase;
-import net.minecraft.world.gen.MapGenCaves;
-import net.minecraft.world.gen.MapGenRavine;
+import net.minecraft.world.gen.*;
 import net.minecraft.world.gen.structure.*;
 
 import net.minecraftforge.common.MinecraftForge;
@@ -58,6 +55,7 @@ public class ChunkProviderRTG implements IChunkGenerator
 {
     private static ChunkProviderRTG populatingProvider;
     private RTGConfig rtgConfig = RTGAPI.config();
+    private ChunkProviderSettingsRTG settings;
     private final MapGenBase caveGenerator;
     private final MapGenBase ravineGenerator;
     private final MapGenStronghold strongholdGenerator;
@@ -115,7 +113,7 @@ public class ChunkProviderRTG implements IChunkGenerator
         }
     };
 
-    public ChunkProviderRTG(World world, long seed) {
+    public ChunkProviderRTG(World world, long seed, String generatorOptions) {
         worldObj = world;
         worldUtil = new WorldUtil(world);
         rtgWorld = new RTGWorld(worldObj);
@@ -174,6 +172,11 @@ public class ChunkProviderRTG implements IChunkGenerator
         }
         else {
             oceanMonumentGenerator = (StructureOceanMonument) TerrainGen.getModdedMapGen(new StructureOceanMonument(), EventType.OCEAN_MONUMENT);
+        }
+
+        if (generatorOptions != null) {
+            this.settings = ChunkProviderSettingsRTG.Factory.jsonToFactory(generatorOptions).build();
+            //worldObj.setSeaLevel(this.settings.seaLevel);
         }
 
         CanyonColour.init(seed);

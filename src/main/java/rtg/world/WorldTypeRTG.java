@@ -10,7 +10,9 @@ import net.minecraft.world.gen.ChunkProviderOverworld;
 
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
 import rtg.RTG;
+import rtg.client.gui.GuiCustomizeWorldScreenRTG;
 import rtg.world.biome.BiomeProviderRTG;
 import rtg.world.gen.ChunkProviderRTG;
 
@@ -57,7 +59,7 @@ public class WorldTypeRTG extends WorldType
         if (world.provider.getDimension() == 0) {
 
             if (chunkProvider == null) {
-                chunkProvider = new ChunkProviderRTG(world, world.getSeed());
+                chunkProvider = new ChunkProviderRTG(world, world.getSeed(), generatorOptions);
                 RTG.instance.runOnNextServerCloseOnly(clearProvider(chunkProvider));
 
                 // inform the event manager about the ChunkEvent.Load event
@@ -68,7 +70,7 @@ public class WorldTypeRTG extends WorldType
             }
 
             // return a "fake" provider that won't decorate for Streams
-            ChunkProviderRTG result = new ChunkProviderRTG(world, world.getSeed());
+            ChunkProviderRTG result = new ChunkProviderRTG(world, world.getSeed(), generatorOptions);
             result.isFakeGenerator();
 
             return result;
@@ -79,6 +81,22 @@ public class WorldTypeRTG extends WorldType
         else return new ChunkProviderOverworld(
             world, world.getSeed(), world.getWorldInfo().isMapFeaturesEnabled(), generatorOptions
         );
+    }
+
+    /**
+     * Called when the 'Customize' button is pressed on world creation GUI
+     *
+     * @param mc             The Minecraft instance
+     * @param guiCreateWorld the createworld GUI
+     */
+    @SideOnly(Side.CLIENT)
+    public void onCustomizeButton(net.minecraft.client.Minecraft mc, net.minecraft.client.gui.GuiCreateWorld guiCreateWorld) {
+        mc.displayGuiScreen(new GuiCustomizeWorldScreenRTG(guiCreateWorld, guiCreateWorld.chunkProviderSettingsJson));
+    }
+
+    @Override
+    public boolean isCustomizable() {
+        return true;
     }
 
     @Override
